@@ -1,0 +1,32 @@
+{
+  "name": "spg-asset-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Scale Point Group - Asset Inspection & Register Management Platform",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=20.12 <23"
+  },
+  "scripts": {
+    "start": "node scripts/migrate.js && node scripts/seed.js && node src/server.js",
+    "start:web": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "test": "node --test tests/"
+  },
+  "dependencies": {
+    "compression": "^1.7.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.16",
+    "pg": "^8.13.1",
+    "pdfjs-dist": "3.11.174",
+    "chart.js": "4.4.7",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  }
+}

@@ -1,0 +1,62 @@
+# Render Blueprint: one web service + one PostgreSQL database.
+# In Render: New > Blueprint > pick this repository. Fill in the values marked "sync: false" when prompted.
+services:
+  - type: web
+    name: spg-asset-platform
+    runtime: node
+    plan: starter            # 512 MB RAM / 0.5 CPU is enough for one organisation; scale up in the dashboard
+    region: singapore        # nearest Render region to Australia
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install --omit=dev   # switch to "npm ci --omit=dev" once package-lock.json is committed
+    startCommand: npm start  # runs database migrations and first-run seeding, then starts the server
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.18.1
+      - key: DATABASE_URL
+        fromDatabase:
+          name: spg-asset-db
+          property: connectionString
+      - key: DATABASE_SSL
+        value: "false"         # internal Render connection; set "true" if you point at an external database
+      - key: APP_BASE_URL
+        sync: false            # e.g. https://spg-asset-platform.onrender.com (or your custom domain)
+      - key: SEED_ORG_NAME
+        value: Scale Point Group
+      - key: SEED_ADMIN_EMAIL
+        sync: false            # first Super Admin login (created once, on first start)
+      - key: SEED_ADMIN_PASSWORD
+        sync: false            # at least 12 characters; you are asked to change it after first login
+      - key: SEED_DEMO_USERS
+        value: "false"         # "true" creates the three demo accounts described in docs/USER-GUIDE.md
+      - key: SEED_DEMO_PASSWORD
+        sync: false
+      - key: SESSION_IDLE_MINUTES
+        value: "60"
+      - key: SESSION_MAX_HOURS
+        value: "12"
+      - key: MAX_UPLOAD_MB
+        value: "50"
+      - key: DB_POOL_MAX
+        value: "8"
+      - key: SMTP_HOST
+        sync: false            # optional: password-reset emails. Leave blank to use admin-issued reset links.
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+
+databases:
+  - name: spg-asset-db
+    databaseName: spg_assets
+    user: spg_app
+    plan: basic-256mb        # paid plan: free Render databases expire after 30 days
+    region: singapore
+    postgresMajorVersion: "16"
